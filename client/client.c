@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    n = read(sockfd, buffer, 255);
+    n = read(sockfd, buffer, 20);
     
     if (n < 0) 
          error("ERROR reading from socket");
