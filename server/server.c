@@ -120,17 +120,22 @@ int main(int argc, char *argv[])
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		if (newsockfd < 0) 
 			error("ERROR on accept");
-		write(newsockfd,counter,100);
+        n = read(newsockfd,buffer,3);
+        int req = atoi(buffer);
+        printf("Request: %d", req);
+        char  num[20];
+        sprintf(num,"%d",counter);
+        bzero(buffer,256);
+        strcpy(buffer, num);
+        write(newsockfd, buffer, 255);
+        counter ++;
+		
 		while(strstr(buffer,"Done")==NULL){
 
 			bzero(buffer,256);
-			n = read(newsockfd,buffer,255);
+			
+            read(newsockfd,buffer,255);
 			if (n < 0) error("ERROR reading from socket");
-			char  num[20];
-			sprintf(num,"%d",counter);
-			bzero(buffer,256);
-			strcpy(buffer, num);
-			buffer[1] = '\0';
 			printf("Here is the message: %s\n",buffer);
 
 		}
