@@ -17,7 +17,7 @@ void error(char *msg)
 	exit(1);
 }
 
-void tokenize(char* line, struct movie* movie){
+/*void tokenize(char* line, struct movie* movie){
     int front = 0;
     int back = 0;
 
@@ -86,7 +86,7 @@ void tokenize(char* line, struct movie* movie){
         movie->values[27] = "";
     }
 
-}
+}*/
 
 int main(int argc, char *argv[])
 {   
@@ -120,8 +120,8 @@ int main(int argc, char *argv[])
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		if (newsockfd < 0) 
 			error("ERROR on accept");
-
-		while(strstr(buffer,"Done")!=NULL){
+		write(newsockfd,counter,100);
+		while(strstr(buffer,"Done")==NULL){
 
 			bzero(buffer,256);
 			n = read(newsockfd,buffer,255);
@@ -134,6 +134,7 @@ int main(int argc, char *argv[])
 			printf("Here is the message: %s\n",buffer);
 
 		}
+		printf("%s\n",buffer);
 
 		counter++;
 		n = write(newsockfd,buffer,2);

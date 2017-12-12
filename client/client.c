@@ -129,13 +129,13 @@ void *threadDir(void *vargp){
     return NULL;
 }
 
-void send(char* CSVName){
+void sendCSV(char* CSVName){
     char buffer[256];
     bzero(buffer, 256);
-    strcpy(buffer, CSVName, strlen(CSVname));
-    buffer[CSVname] = '\0';
+    strncpy(buffer, CSVName, strlen(CSVName));
+    buffer[strlen(CSVName)] = '\0';
     pthread_mutex_lock(&socketLock);
-    write(sockfd, buffer, 255)
+    write(sockfd, buffer, 255);
     pthread_mutex_unlock(&socketLock);
 
 
@@ -146,7 +146,7 @@ void *threadCSV(void *vargp){
     //printf("%s ", CSVName);
     //printf("%d,", (long) pthread_self());
 
-    send(CSVName);
+    sendCSV(CSVName);
     
     //sort(CSVName, sortedValue);
     
@@ -233,7 +233,8 @@ int main(int argc, char *argv[])
 
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    n = read(sockfd, buffer, 2);
+    n = read(sockfd, buffer, 100);
+    printf("Session ID:%s\n",buffer);
     if (n < 0) 
          error("ERROR reading from socket");
 
