@@ -182,10 +182,17 @@ int main(int argc, char *argv[])
     serv_addr.sin_port = htons(portno);
     if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) 
         error("ERROR connecting");
+
     printf("Please enter the message: ");
     bzero(buffer,256);
-    fgets(buffer,255,stdin);
+    buffer = "0"
     n = write(sockfd,buffer,strlen(buffer));
+    bzero(buffer, 256);
+    char* sessionStr = read(sock, buffer, 255);
+    int sessionNum = atoi(sessionStr);
+
+    printf("%d\n", sessionNum);
+
     if (n < 0) 
          error("ERROR writing to socket");
     bzero(buffer,256);
