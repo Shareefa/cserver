@@ -23,7 +23,7 @@
 void *threadDir(void *vargp);
 void *threadCSV(void *vargp);
 
-
+pthread_mutex_t socketLock;
 pthread_mutex_t totalFilesLock;
 pthread_mutex_t totalThreadsLock;
 int globTotalSortedFiles = 0;
@@ -129,10 +129,24 @@ void *threadDir(void *vargp){
     return NULL;
 }
 
+void send(char* CSVName){
+    char buffer[256];
+    bzero(buffer, 256);
+    strcpy(buffer, CSVName, strlen(CSVname));
+    buffer[CSVname] = '\0';
+    pthread_mutex_lock(&socketLock);
+    write(sockfd, buffer, 255)
+    pthread_mutex_unlock(&socketLock);
+
+
+}
+
 void *threadCSV(void *vargp){
     char* CSVName = vargp;
     //printf("%s ", CSVName);
-    printf("%d,", (long) pthread_self());
+    //printf("%d,", (long) pthread_self());
+
+    send(CSVName);
     
     //sort(CSVName, sortedValue);
     
@@ -224,6 +238,48 @@ int main(int argc, char *argv[])
          error("ERROR reading from socket");
 
     int sessionNum = atoi(buffer);
+
+
+
+    DIR *dir;
+    DIR *checkDirPointer;
+    if(strcmp(currDirectory, ".") != 0){
+                
+        if((dir = opendir(currDirectory)) == NULL){
+            char* newDir = malloc(3+strlen(currDirectory));
+            strcpy(newDir, "./");
+            strcat(newDir, currDirectory);
+            currDirectory = newDir;
+        
+            if((dir = opendir(currDirectory)) == NULL){
+                printf("cannot open start directory\n");
+                return 1;
+            }
+        }
+
+    } else{
+        dir = opendir(currDirectory);
+    } if(outputDirectory != NULL){
+            
+        if((checkDirPointer = opendir(outputDirectory)) == NULL){
+            char* newDir = malloc(3+strlen(outputDirectory));   
+            strcpy(newDir, "./");
+            strcat(newDir, outputDirectory);
+            outputDirectory = newDir;
+        
+            if((checkDirPointer = opendir(outputDirectory)) == NULL){
+                printf("cannot open output directory\n");
+                return 1;
+            }
+        }
+        closedir(checkDirPointer);
+    }
+
+    pthread_mutex_lock(&socketLock);
+    n = write(sockfd,"Done",5);
+    pthread_mutex_unlock(&socketLock);
+
+
 
     
 
