@@ -66,7 +66,7 @@ int checkDir(char* filename){
 void *threadDir(void *vargp){
     char* currDirectory =  vargp;
     //printf("%s ", currDirectory);
-    printf("%d,", (long) pthread_self());
+    //printf("%d,", (long) pthread_self());
     
     char* toOpen = malloc(strlen(currDirectory) + 1);
     strcpy(toOpen, currDirectory);
@@ -228,12 +228,13 @@ int main(int argc, char *argv[])
 
     printf("Please enter the message: ");
     bzero(buffer,256);
-    buffer[0] = '0';
-    buffer[1] = '\0';
+    buffer[0] = '-';
+    buffer[1] = '1';
+    buffer[2] = '\0';
 
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    n = read(sockfd, buffer, 100);
+    n = read(sockfd, buffer, 255);
     
     if (n < 0) 
          error("ERROR reading from socket");
@@ -280,8 +281,13 @@ int main(int argc, char *argv[])
 
     pthread_t tid = 0;
     //printf("%s \n", currDirectory);
+    printf("Starting threading\n");
     pthread_create(&tid, NULL, threadDir, currDirectory);
     pthread_join(tid, NULL);
+
+    bzero(buffer,256);
+    strncpy(buffer, "Done", 4);
+
     pthread_mutex_lock(&socketLock);
     n = write(sockfd,"Done",5);
     pthread_mutex_unlock(&socketLock);
