@@ -219,13 +219,15 @@ int main(int argc, char *argv[])
 
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    char* sessionStr = read(sockfd, buffer, 255);
-    int sessionNum = atoi(sessionStr);
+    n = read(sockfd, buffer, 255);
+    if (n < 0) 
+         error("ERROR reading from socket");
+     
+    int sessionNum = atoi(buffer);
 
     
 
-    if (n < 0) 
-         error("ERROR writing to socket");
+    
     printf("%d\n", sessionNum);
     
     // n = read(sockfd,buffer,255);
