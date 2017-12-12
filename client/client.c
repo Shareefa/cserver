@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <unistd.h>
+#include <pthread.h>
 #ifndef what
 #define what
 #include "sorter.h"
@@ -191,14 +192,15 @@ int main(int argc, char *argv[])
     char* sessionStr = read(sock, buffer, 255);
     int sessionNum = atoi(sessionStr);
 
-    printf("%d\n", sessionNum);
+    
 
     if (n < 0) 
          error("ERROR writing to socket");
-    bzero(buffer,256);
-    n = read(sockfd,buffer,255);
-    if (n < 0) 
-         error("ERROR reading from socket");
-    printf("%s\n",buffer);
+    printf("%d\n", sessionNum);
+    
+    // n = read(sockfd,buffer,255);
+    // if (n < 0) 
+    //      error("ERROR reading from socket");
+    // printf("%s\n",buffer);
     return 0;
 }
