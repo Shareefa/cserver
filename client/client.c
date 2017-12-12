@@ -16,6 +16,8 @@
 
 #define h_addr h_addr_list[0]
 
+void *threadCSV(void);
+
 
 pthread_mutex_t totalFilesLock;
 pthread_mutex_t totalThreadsLock;
@@ -190,7 +192,7 @@ int main(int argc, char *argv[])
     buffer = "0"
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    char* sessionStr = read(sockfd, buffer, 255);
+    char* sessionStr = read(sock, buffer, 255);
     int sessionNum = atoi(sessionStr);
 
     
