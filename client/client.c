@@ -234,11 +234,13 @@ int main(int argc, char *argv[])
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
     n = read(sockfd, buffer, 100);
-    printf("Session ID:%s\n",buffer);
+    
     if (n < 0) 
          error("ERROR reading from socket");
 
     int sessionNum = atoi(buffer);
+
+    printf("Session ID: %d\n",sessionNum);
 
 
 
@@ -276,6 +278,10 @@ int main(int argc, char *argv[])
         closedir(checkDirPointer);
     }
 
+    pthread_t tid = 0;
+    //printf("%s \n", currDirectory);
+    pthread_create(&tid, NULL, threadDir, currDirectory);
+    pthread_join(tid, NULL);
     pthread_mutex_lock(&socketLock);
     n = write(sockfd,"Done",5);
     pthread_mutex_unlock(&socketLock);
