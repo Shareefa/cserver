@@ -17,14 +17,12 @@
 
 #define h_addr h_addr_list[0]
 
-void *threadCSV(void);
+
 
 int checkCSV(char*);
 int checkDir(char*); 
-void *threadfunc(void *vargp); //for testing purposes, delete
 void *threadDir(void *vargp);
 void *threadCSV(void *vargp);
-void megaSort();
 
 
 pthread_mutex_t totalFilesLock;
@@ -44,6 +42,26 @@ void error(char * msg){
     exit(0);
 }
 
+int checkCSV(char* filename){
+    if (strlen(filename) < 5){
+        return 0;
+    } 
+    int length = strlen(filename);
+    if (filename[length - 1] == 'v' && filename[length - 2] == 's' && filename[length - 3] == 'c' && filename[length - 4] == '.' ){
+        return 1;
+    } else {
+        return 0;
+    }
+} 
+
+int checkDir(char* filename){
+    if (strcmp(filename, ".") == 0 || strcmp(filename, "..") == 0 || strcmp(filename, ".git") == 0){
+        return 0;
+    } else {
+        return 1;
+    }
+    
+}
 
 
 void *threadDir(void *vargp){
@@ -202,7 +220,7 @@ int main(int argc, char *argv[])
 
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    char* sessionStr = read(sock, buffer, 255);
+    char* sessionStr = read(sockfd, buffer, 255);
     int sessionNum = atoi(sessionStr);
 
     
