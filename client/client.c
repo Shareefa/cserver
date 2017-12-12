@@ -4,6 +4,7 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <string.h>
+#include <dirent.h>
 #include <stdlib.h>
 #include <strings.h>
 #include <unistd.h>
@@ -189,7 +190,7 @@ int main(int argc, char *argv[])
     buffer = "0"
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
-    char* sessionStr = read(sock, buffer, 255);
+    char* sessionStr = read(sockfd, buffer, 255);
     int sessionNum = atoi(sessionStr);
 
     
