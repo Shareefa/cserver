@@ -47,8 +47,9 @@ int main(int argc, char *argv[])
     char* num = itoa(counter)
     bzero(buffer,256);
     strcpy(buffer, num)
+    buffer[1] = '\0'
     printf("Here is the message: %s\n",buffer);
-    n = write(newsockfd,buffer,255);
+    n = write(newsockfd,buffer,2);
     if (n < 0) error("ERROR writing to socket");
     return 0; 
 }
