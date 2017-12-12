@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h> 
@@ -17,6 +18,13 @@
 #define h_addr h_addr_list[0]
 
 void *threadCSV(void);
+
+int checkCSV(char*);
+int checkDir(char*); 
+void *threadfunc(void *vargp); //for testing purposes, delete
+void *threadDir(void *vargp);
+void *threadCSV(void *vargp);
+void megaSort();
 
 
 pthread_mutex_t totalFilesLock;
@@ -189,7 +197,9 @@ int main(int argc, char *argv[])
 
     printf("Please enter the message: ");
     bzero(buffer,256);
-    buffer = "0"
+    buffer[0] = '0';
+    buffer[1] = '\0';
+
     n = write(sockfd,buffer,strlen(buffer));
     bzero(buffer, 256);
     char* sessionStr = read(sock, buffer, 255);
