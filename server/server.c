@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <unistd.h>
+#include <pthread.h>
+struct movie ** movies;
+pthread_mutex_t * locks;
+
 void error(char *msg)
 {
 	perror(msg);
@@ -16,6 +20,8 @@ void error(char *msg)
 int main(int argc, char *argv[])
 {   
 
+	movies=(struct movie **) malloc(sizeof(struct movie *)*100);
+	locks=(pthread_mutex_t *) malloc(sizeof(pthread_mutex_t)*100);
 	int sockfd, newsockfd, portno, clilen, counter;
 	counter = 0;
 	char buffer[256];
@@ -43,19 +49,24 @@ int main(int argc, char *argv[])
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
 		if (newsockfd < 0) 
 			error("ERROR on accept");
-		bzero(buffer,256);
-		n = read(newsockfd,buffer,255);
-		if (n < 0) error("ERROR reading from socket");
-		char  num[20];
-		sprintf(num,"%d",counter);
-		bzero(buffer,256);
-		strcpy(buffer, num);
-		buffer[1] = '\0';
-		printf("Here is the message: %s\n",buffer);
+
+		while(strstr(buffer,"Done")!=NULL){
+
+			bzero(buffer,256);
+			n = read(newsockfd,buffer,255);
+			if (n < 0) error("ERROR reading from socket");
+			char  num[20];
+			sprintf(num,"%d",counter);
+			bzero(buffer,256);
+			strcpy(buffer, num);
+			buffer[1] = '\0';
+			printf("Here is the message: %s\n",buffer);
+
+		}
+
 		counter++;
 		n = write(newsockfd,buffer,2);
 		if (n < 0) error("ERROR writing to socket");
-
 
 	}
 	return 0; 
