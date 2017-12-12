@@ -19,8 +19,7 @@
 
 
 
-int checkCSV(char*);
-int checkDir(char*); 
+
 void *threadDir(void *vargp);
 void *threadCSV(void *vargp);
 
@@ -135,7 +134,7 @@ void *threadCSV(void *vargp){
     //printf("%s ", CSVName);
     printf("%d,", (long) pthread_self());
     
-    sort(CSVName, sortedValue);
+    //sort(CSVName, sortedValue);
     
     return NULL;
 }
