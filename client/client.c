@@ -245,52 +245,6 @@ int main(int argc, char *argv[])
 
 
 
-    DIR *dir;
-    DIR *checkDirPointer;
-    if(strcmp(currDirectory, ".") != 0){
-                
-        if((dir = opendir(currDirectory)) == NULL){
-            char* newDir = malloc(3+strlen(currDirectory));
-            strcpy(newDir, "./");
-            strcat(newDir, currDirectory);
-            currDirectory = newDir;
-        
-            if((dir = opendir(currDirectory)) == NULL){
-                printf("cannot open start directory\n");
-                return 1;
-            }
-        }
-
-    } else{
-        dir = opendir(currDirectory);
-    } if(outputDirectory != NULL){
-            
-        if((checkDirPointer = opendir(outputDirectory)) == NULL){
-            char* newDir = malloc(3+strlen(outputDirectory));   
-            strcpy(newDir, "./");
-            strcat(newDir, outputDirectory);
-            outputDirectory = newDir;
-        
-            if((checkDirPointer = opendir(outputDirectory)) == NULL){
-                printf("cannot open output directory\n");
-                return 1;
-            }
-        }
-        closedir(checkDirPointer);
-    }
-
-    pthread_t tid = 0;
-    //printf("%s \n", currDirectory);
-    printf("Starting threading\n");
-    pthread_create(&tid, NULL, threadDir, currDirectory);
-    pthread_join(tid, NULL);
-
-    bzero(buffer,256);
-    strncpy(buffer, "Done", 4);
-
-    pthread_mutex_lock(&socketLock);
-    n = write(sockfd,"Done",5);
-    pthread_mutex_unlock(&socketLock);
 
 
 

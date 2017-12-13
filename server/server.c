@@ -10,6 +10,8 @@
 #include <pthread.h>
 struct movie ** movies;
 pthread_mutex_t * locks;
+int counter=0;
+pthread_mutex_t sessionLock;
 
 void error(char *msg)
 {
@@ -88,6 +90,52 @@ movie->values[27] = "";
 
 }*/
 
+void * listenClient(void * vargp){
+	
+	char buffer[256];
+	int portno, clilen;
+	int n;
+	int * sockfd=vargp;
+	int newsockfd= *(sockfd);
+	if (newsockfd < 0) 
+		error("ERROR on accept");
+	n = read(newsockfd,buffer,3);
+	int req = atoi(buffer);
+	printf("Request: %d\n", req);
+
+	if(req==-1){
+		//counter++;
+		char  num[20];
+		sprintf(num,"%d",counter);
+		bzero(buffer,256);
+		strcpy(buffer, num);
+		write(newsockfd, buffer, 20);
+		pthread_mutex_lock(&sessionLock);
+		counter ++;
+		pthread_mutex_unlock(&sessionLock);
+	}else if(req==0){
+		while(strstr(buffer,"Done")==NULL){
+			bzero(buffer,256);
+			read(newsockfd,buffer,255);
+			if (n < 0) error("ERROR reading from socket");
+			printf("Here is the message: %s\n",buffer);
+
+		}
+
+	}else if(req==1){
+
+	}
+
+	//fflush(stdout);
+
+	//printf("%s\n",buffer);
+
+	//counter++;
+	n = write(newsockfd,buffer,2);
+	if (n < 0) error("ERROR writing to socket");
+
+}
+
 int main(int argc, char *argv[])
 {   
 
@@ -95,13 +143,12 @@ int main(int argc, char *argv[])
 	locks=(pthread_mutex_t *) malloc(sizeof(pthread_mutex_t)*100);
 	int sockfd, newsockfd, portno, clilen, counter;
 	counter = 0;
-	char buffer[256];
 	struct sockaddr_in serv_addr, cli_addr;
-	int n;
 	if (argc < 2) {
 		fprintf(stderr,"ERROR, no port provided\n");
 		exit(1);
 	}
+	sessionLock=
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) 
 		error("ERROR opening socket");
@@ -118,33 +165,9 @@ int main(int argc, char *argv[])
 	while(1){
 
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-		if (newsockfd < 0) 
-			error("ERROR on accept");
-		n = read(newsockfd,buffer,3);
-		int req = atoi(buffer);
-		printf("Request: %d\n", req);
-		//fflush(stdout);
-		char  num[20];
-		sprintf(num,"%d",counter);
-		bzero(buffer,256);
-		strcpy(buffer, num);
-		write(newsockfd, buffer, 20);
-		counter ++;
-
-		while(strstr(buffer,"Done")==NULL){
-
-			bzero(buffer,256);
-
-			read(newsockfd,buffer,255);
-			if (n < 0) error("ERROR reading from socket");
-			printf("Here is the message: %s\n",buffer);
-
-		}
-		//printf("%s\n",buffer);
-
-		//counter++;
-		n = write(newsockfd,buffer,2);
-		if (n < 0) error("ERROR writing to socket");
+		
+		pthread_t tid;
+		pthread_create(&tid,NULL,listenClient,&newsockfd);
 
 	}
 	return 0; 
