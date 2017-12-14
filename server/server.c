@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include "sorter.h"
-
+#include <arpa/inet.h>
 struct movie ** movies;
 pthread_mutex_t * locks;
 char* sortValues[100];
@@ -106,7 +106,7 @@ void * listenClient(void * vargp){
 	while(1){
 		n = read(newsockfd,buffer,3);
 		int req = atoi(buffer);
-		printf("Request: %d\n", req);
+		//printf("Request: %d\n", req);
 
 		if(req==-1){
 
@@ -130,7 +130,7 @@ void * listenClient(void * vargp){
 				
 			while(strstr(buffer,"*$$*")==NULL){
 				if (n < 0) error("ERROR reading from socket");
-				printf("Here is the message: %s\n",buffer);
+				//printf("Here is the message: %s\n",buffer);
 
 				pthread_mutex_lock(&locks[index]);
 				tokenize(buffer, &(movies[index][movieCounter]));
@@ -154,14 +154,14 @@ void * listenClient(void * vargp){
 			char* sortValue = (char*) malloc(255);
 			strcpy(sortValue, buffer);
 
-			printf("TESTING THE TOKENIZE \n");
+			//printf("TESTING THE TOKENIZE \n");
 			for(int i = 0; i < 26; i++){
-				printf("%s,", movies[index][0].values[i]);
+				//printf("%s,", movies[index][0].values[i]);
 			}			
-			printf("\n");
+			//printf("\n");
 
 			int sortIndex = 0;
-			printf("SORTING OCCURS HERE \n");
+			//printf("SORTING OCCURS HERE \n");
 			if (strcmp(sortValue,"color") == 0) {
 				mergesort(movies[index], 0, movieCounter);
 				sortIndex = 0;
@@ -253,7 +253,7 @@ void * listenClient(void * vargp){
 //				return -1;
 			}
 			char  status[2];
-			printf("TESTING THE TOKENIZE \n");
+		//	printf("TESTING THE TOKENIZE \n");
 			for(int j = 0; j < movieCounter; j++){
 				char * line = (char *) malloc(500);
 				bzero(line,500);
@@ -267,7 +267,7 @@ void * listenClient(void * vargp){
 				if(s<0)printf ("ERRORR");
 				read(newsockfd,status,2);
 			}
-			printf("\n");
+			//printf("\n");
 			
 			write(newsockfd, "*****", 500);
 
@@ -304,6 +304,8 @@ int main(int argc, char *argv[])
 		}
 	}
 	locks=(pthread_mutex_t *) malloc(sizeof(pthread_mutex_t)*100);
+	printf("Received connections from: ");
+	fflush(stdout);
 	int sockfd, newsockfd, portno, clilen, counter;
 	counter = 0;
 	struct sockaddr_in serv_addr, cli_addr;
@@ -328,7 +330,13 @@ int main(int argc, char *argv[])
 	while(1){
 
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-
+		struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&cli_addr;
+		struct in_addr ipAddr = pV4Addr->sin_addr;
+		char str[INET_ADDRSTRLEN];
+		
+		inet_ntop( AF_INET, &ipAddr, str, INET_ADDRSTRLEN );
+		printf("%s,", str);
+		fflush(stdout);
 		pthread_t tid;
 		pthread_create(&tid,NULL,listenClient,&newsockfd);
 
