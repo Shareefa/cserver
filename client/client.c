@@ -239,7 +239,7 @@ void sendCSV(char* CSVName){
 
 
 
-		char buffer[256];
+		char buffer[512];
 
 
 		bzero((char *) &serv_addr, sizeof(serv_addr));
@@ -256,18 +256,23 @@ void sendCSV(char* CSVName){
 		buffer[0] = '-';
 		buffer[1] = '1';
 		buffer[2] = '\0';
-
+		
+		//this is writing the original -1
 		n = write(sockfd,buffer,strlen(buffer));
 		bzero(buffer, 256);
+		
+		//this is reading the session id 
 		n = read(sockfd, buffer, 20);
 
 		if (n < 0) 
 			error("ERROR reading from socket");
-		int sessionNum = atoi(buffer);
-		printf("Session ID: %d\n",sessionNum);
-		buffer[0]='0';
-		buffer[1]='\0';
-		write(sockfd,buffer,2);
+		char buff[3];
+		
+		printf("Session ID: %s\n",buffer);
+		buff[0]='0';
+		buff[1]='\0';
+		write(sockfd,buff,3);
+		write(sockfd, buffer,20);
 		DIR *dir;
 		DIR *checkDirPointer;
 		if(strcmp(currDirectory, ".") != 0){
@@ -308,8 +313,49 @@ void sendCSV(char* CSVName){
 		pthread_create(&tid, NULL, threadDir, currDirectory);
 		pthread_join(tid, NULL);
 		printf("Done");
-		write(sockfd,"Done",5);
-		printf("%d\n", sessionNum);
+		write(sockfd,"*$$*",511);
+		printf("%s\n", buffer);
+		buff[0] = '1';
+		buff[1] = '\0';
+	
+		write(sockfd, buff, 3);
+		write(sockfd, buffer, 20);
+
+		bzero(buffer, 256);
+		strcpy(buffer, sortedValue);
+		buffer[strlen(sortedValue)] = '\0';
+		//this is writing the sorted value		
+		n = write(sockfd,buffer,255);
+		
+		char* out = "AllFiles-sort-<";
+		char* outFilePath  = (char *) malloc(10000);
+		
+		strcpy(outFilePath,outputDirectory);
+		strcat(outFilePath, "/");
+		strcat(outFilePath, out);
+		strcat(outFilePath, sortedValue);
+		strcat(outFilePath, ">.csv\0");
+		
+		FILE* output = fopen(outFilePath, "w");
+		
+		char* firstLine = "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\r\n";
+		
+		fprintf(output, "%s", firstLine);
+
+		read(sockfd, buffer, 500);
+		while(strstr(buffer, "*****")==NULL){
+			int last = strlen(buffer);
+			buffer[last] = '\r';
+			buffer[last+1] = '\n';
+			buffer[last+2]  = '\0';
+			fprintf(output, "%s", buffer);
+			write(sockfd,"1",2);
+			int s=read(sockfd, buffer, 500);
+			if(s<0)printf("ERROR");
+			
+		}
+		printf("DONE: %s\n", buffer);
+		fclose(output);
 
 		// n = read(sockfd,buffer,255);
 		// if (n < 0) 
