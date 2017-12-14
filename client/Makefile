@@ -1,8 +1,8 @@
 lsall:client
 
 
-client: client.c
-	gcc -pthread -g client.c -o client -lm       
+client: sorter_client.c
+	gcc -pthread -g sorter_client.c -o sorter_client -lm       
 
 clean:
 	rm -rf first
