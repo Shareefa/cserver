@@ -130,7 +130,7 @@ void * listenClient(void * vargp){
 				
 			while(strstr(buffer,"*$$*")==NULL){
 				if (n < 0) error("ERROR reading from socket");
-				//printf("Here is the message: %s\n",buffer);
+				printf("Here is the message: %s\n",buffer);
 
 				pthread_mutex_lock(&locks[index]);
 				tokenize(buffer, &(movies[index][movieCounter]));
@@ -154,14 +154,14 @@ void * listenClient(void * vargp){
 			char* sortValue = (char*) malloc(255);
 			strcpy(sortValue, buffer);
 
-			//printf("TESTING THE TOKENIZE \n");
+			printf("TESTING THE TOKENIZE \n");
 			for(int i = 0; i < 26; i++){
 				//printf("%s,", movies[index][0].values[i]);
 			}			
 			//printf("\n");
 
 			int sortIndex = 0;
-			//printf("SORTING OCCURS HERE \n");
+			printf("SORTING OCCURS HERE \n");
 			if (strcmp(sortValue,"color") == 0) {
 				mergesort(movies[index], 0, movieCounter);
 				sortIndex = 0;
@@ -330,6 +330,7 @@ int main(int argc, char *argv[])
 	while(1){
 
 		newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+		
 		struct sockaddr_in* pV4Addr = (struct sockaddr_in*)&cli_addr;
 		struct in_addr ipAddr = pV4Addr->sin_addr;
 		char str[INET_ADDRSTRLEN];
