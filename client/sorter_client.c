@@ -137,8 +137,8 @@ void sendCSV(char* CSVName){
 	//strncpy(buffer, CSVName, strlen(CSVName));
 	//buffer[strlen(CSVName)] = '\0';
 	size_t a = 1;
-	FILE * read=fopen(CSVName,"r");
-	getline(&line,&a,read);  
+	FILE * readFile=fopen(CSVName,"r");
+	getline(&line,&a,readFile);  
 	if(strcmp(line, "color,director_name,num_critic_for_reviews,duration,director_facebook_likes,actor_3_facebook_likes,actor_2_name,actor_1_facebook_likes,gross,genres,actor_1_name,movie_title,num_voted_users,cast_total_facebook_likes,actor_3_name,facenumber_in_poster,plot_keywords,movie_imdb_link,num_user_for_reviews,language,country,content_rating,budget,title_year,actor_2_facebook_likes,imdb_score,aspect_ratio,movie_facebook_likes\r\n") == 0){
 		printf("good\n");
 		fflush(stdout);
@@ -151,14 +151,16 @@ void sendCSV(char* CSVName){
 	}
 
 	printf("CSV Name: %s", CSVName);
-
-	while(getline(&line, &a, read) != EOF){
+	
+	char status[3];
+	while(getline(&line, &a, readFile) != EOF){
 		//while(fgets(equal, 12000, read) != EOF){
 		//tokenize(equal, &(movieArray[counter]));
 		bzero(buffer, 512);
 		strcpy(buffer, line);
 		buffer[strlen(line)-2] = '\0';
 		write(sockfd, buffer, 511);
+		read(sockfd,status,3);
 	}
 
 
@@ -270,7 +272,10 @@ void sendCSV(char* CSVName){
 		
 		printf("Session ID: %s\n",buffer);
 		buff[0]='0';
+		//buff[1]=' ';
 		buff[1]='\0';
+		//strcat(buff,buffer);
+		
 		write(sockfd,buff,3);
 		write(sockfd, buffer,20);
 		DIR *dir;

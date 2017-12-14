@@ -105,7 +105,11 @@ void * listenClient(void * vargp){
 		error("ERROR on accept");
 	while(1){
 		n = read(newsockfd,buffer,3);
-		int req = atoi(buffer);
+		int req; 
+		int info;
+		
+		req=atoi(buffer);
+		
 		//printf("Request: %d\n", req);
 
 		if(req==-1){
@@ -123,27 +127,32 @@ void * listenClient(void * vargp){
 		}else if(req==0){
 
 			char num[3];
+			num[0]='1';
+			num[1]='\0';
 			read(newsockfd, buffer, 20);
 			int index = atoi(buffer);
 			bzero(buffer,512);
 			read(newsockfd,buffer,511);
-				
+			write(newsockfd,num,3);	
 			while(strstr(buffer,"*$$*")==NULL){
 				if (n < 0) error("ERROR reading from socket");
-				printf("Here is the message: %s\n",buffer);
+				//printf("Here is the message: %s\n",buffer);
 
 				pthread_mutex_lock(&locks[index]);
-				tokenize(buffer, &(movies[index][movieCounter]));
+				struct movie * currMovie=&(movies[index][movieCounter]);
+				char ** values=&(currMovie->values);
+				values=(char **)malloc(sizeof(char *)*28);
+				tokenize(buffer, currMovie);
 				movieCounter++;
 				pthread_mutex_unlock(&locks[index]);
 				bzero(buffer, 512);
 				read(newsockfd,buffer,511);
-				
+				write(newsockfd,num,3);	
 			}
 			bzero(buffer,512);
 
 		}else if(req==1){
-
+			
 			char num[3];
 			read(newsockfd, buffer, 20);
 			int index = atoi(buffer);	
@@ -154,14 +163,14 @@ void * listenClient(void * vargp){
 			char* sortValue = (char*) malloc(255);
 			strcpy(sortValue, buffer);
 
-			printf("TESTING THE TOKENIZE \n");
+			//printf("TESTING THE TOKENIZE \n");
 			for(int i = 0; i < 26; i++){
 				//printf("%s,", movies[index][0].values[i]);
 			}			
 			//printf("\n");
 
 			int sortIndex = 0;
-			printf("SORTING OCCURS HERE \n");
+			//printf("SORTING OCCURS HERE \n");
 			if (strcmp(sortValue,"color") == 0) {
 				mergesort(movies[index], 0, movieCounter);
 				sortIndex = 0;
@@ -270,7 +279,7 @@ void * listenClient(void * vargp){
 			//printf("\n");
 			
 			write(newsockfd, "*****", 500);
-
+			movies[index]=NULL;
 
 
 			pthread_mutex_unlock(&locks[index]);
